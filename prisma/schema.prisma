@@ -1,0 +1,53 @@
+// prisma/schema.prisma
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Employee {
+  id     Int     @id @default(autoincrement())
+  userId Int     @unique
+  name   String
+  photo  String?
+  user   User    @relation(references: [id], fields: [userId])
+}
+
+model User {
+  id       Int       @id @default(autoincrement())
+  email    String    @unique
+  password String
+  phone    String    @unique
+  roleId   Int
+  role     Role?     @relation(fields: [roleId], references: [id])
+  employee Employee?
+}
+
+model Role {
+  id          Int          @id @default(autoincrement())
+  name        String       @unique
+  description String?
+  user        User[]
+  permission  Permission[]
+}
+
+model Permission {
+  id      Int     @id @default(autoincrement())
+  roleId  Int
+  modulId Int
+  access  String?
+  role    Role?   @relation(fields: [roleId], references: [id])
+  modul    Modul?   @relation(fields: [modulId], references: [id])
+}
+
+model Modul {
+  id          Int     @id @default(autoincrement())
+  name        String  @unique
+  feature     String
+  description String?
+  Permission  Permission[]
+}
